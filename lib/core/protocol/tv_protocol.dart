@@ -70,3 +70,18 @@ class TvNotConnectedException implements Exception {
   @override
   String toString() => 'Aucun téléviseur connecté.';
 }
+
+/// Le téléviseur refuse ce téléphone : il faut (re)faire l'association.
+class TvNotPairedException implements Exception {
+  const TvNotPairedException();
+  @override
+  String toString() => 'Ce téléphone n’est pas associé au téléviseur.';
+}
+
+/// Fonction non disponible dans l'état actuel du téléviseur.
+class TvFeatureException implements Exception {
+  const TvFeatureException(this.message);
+  final String message;
+  @override
+  String toString() => message;
+}

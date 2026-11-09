@@ -6,6 +6,7 @@ import '../../../app/router.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../core/protocol/tv_protocol.dart';
 import '../../../shared/widgets/connection_badge.dart';
+import '../../../shared/widgets/connection_banner.dart';
 import '../../../shared/widgets/remote_button.dart';
 import '../../remote/domain/remote_controller.dart';
 
@@ -30,6 +31,7 @@ class HomeScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          const ConnectionBanner(),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(20),

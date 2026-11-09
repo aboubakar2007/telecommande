@@ -33,7 +33,7 @@ class _KeyboardScreenState extends ConsumerState<KeyboardScreen> {
     try {
       await ref.read(remoteControllerProvider.notifier).sendText(text);
       _ctrl.clear();
-    } on TvNotConnectedException catch (e) {
+    } on Exception catch (e) {
       if (mounted) showNotConnected(context, e);
     }
   }

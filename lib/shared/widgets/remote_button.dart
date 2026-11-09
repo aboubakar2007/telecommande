@@ -14,7 +14,7 @@ Future<void> sendTvKey(BuildContext context, WidgetRef ref, TvKey key,
     {KeyPress press = KeyPress.short}) async {
   try {
     await ref.read(remoteControllerProvider.notifier).press(key, press: press);
-  } on TvNotConnectedException catch (e) {
+  } on Exception catch (e) {
     if (context.mounted) showNotConnected(context, e);
   }
 }

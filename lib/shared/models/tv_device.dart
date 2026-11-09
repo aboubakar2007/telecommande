@@ -9,6 +9,7 @@ class TvDevice {
     this.paired = false,
   });
 
+  /// Identifiant stable : nom de service mDNS (ou IP si ajout manuel).
   final String id;
   final String name;
   final String host;
@@ -16,10 +17,10 @@ class TvDevice {
   final int pairingPort;
   final bool paired;
 
-  TvDevice copyWith({String? name, bool? paired}) => TvDevice(
+  TvDevice copyWith({String? name, String? host, bool? paired}) => TvDevice(
         id: id,
         name: name ?? this.name,
-        host: host,
+        host: host ?? this.host,
         remotePort: remotePort,
         pairingPort: pairingPort,
         paired: paired ?? this.paired,

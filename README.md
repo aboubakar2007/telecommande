@@ -10,17 +10,33 @@ Android + iOS, Flutter. Pas d'Internet, pas de serveur, pas de publication sur l
 
 | Phase | État |
 |---|---|
-| 1. Analyse | ✅ Validée. Compatibilité de la Sony confirmée sur le réseau (ports 6466/6467, mDNS `_androidtvremote2._tcp`) |
-| 2. Initialisation (projet, architecture, thème, écrans) | ✅ |
-| 3. Communication réseau (découverte, association, connexion) | ⏳ À faire |
-| 4. Télécommande complète | ⏳ |
-| 5. Gestion familiale | ⏳ |
+| 1. Analyse | ✅ Compatibilité de la Sony confirmée (ports 6466/6467, mDNS `_androidtvremote2._tcp`) |
+| 2. Initialisation | ✅ |
+| 3. Communication réseau | ✅ Codé et testé (20 tests). ⏳ Association réelle à valider sur la Sony |
+| 4. Télécommande, pavé tactile, clavier, raccourcis applis | ✅ Codé, ⏳ à valider sur la TV |
+| 5. Gestion familiale (télés enregistrées, reconnexion auto) | ✅ Codé, ⏳ à valider |
 | 6. Finalisation | ⏳ |
 
-## Ce qui fonctionne réellement aujourd'hui
-- Navigation entre tous les écrans (splash, accueil, recherche, association, télécommande, pavé tactile, clavier, appareils, paramètres).
-- Paramètres enregistrés sur le téléphone (nom du téléphone, sensibilité du pavé, vibrations).
-- **Aucune commande n'est encore envoyée à la télé.** Chaque bouton affiche « Aucun téléviseur connecté. » tant que la phase 3 n'est pas terminée.
+## Fonctionnalités
+- **Détection automatique** des télés compatibles sur le Wi-Fi (mDNS), ou saisie manuelle de l'adresse IP.
+- **Association sécurisée** : la télé affiche un code à 6 caractères, saisi dans l'appli. Un code mal tapé est détecté avant l'envoi.
+- **Télécommande** : flèches, OK, retour, accueil, menu, power, volume (avec niveau affiché), muet, multimédia. Appui maintenu = répétition.
+- **Pavé tactile** : les glissements deviennent des flèches, un tap vaut OK. Pas de curseur souris : le protocole n'en propose pas.
+- **Clavier** : envoie du texte dans le champ ouvert sur la télé (recherche YouTube, etc.).
+- **Raccourcis** YouTube, Netflix et Prime Video.
+- **Mes appareils** : télés enregistrées, oublier une télé, reconnexion automatique au démarrage et après une coupure.
+- Chaque téléphone a son propre certificat, stocké dans le Keystore (Android) ou le Keychain (iOS), et s'associe séparément.
+
+## Installation
+- **Android** : `build/app/outputs/flutter-apk/app-release.apk`, à copier sur le téléphone puis installer.
+- **iPhone** : GitHub → Actions → « Build iOS IPA » → Run workflow, puis télécharger l'artifact `FamilyRemote-ipa` et l'installer avec Sideloadly.
+- Au premier lancement sur iPhone, **accepter l'accès au réseau local**.
+
+## Outil de test (PC)
+```bash
+dart run tool/atv_cli.dart pair 192.168.100.3        # association depuis le PC
+dart run tool/atv_cli.dart key 192.168.100.3 home ok # envoi de touches
+```
 
 ## Lancer le projet
 

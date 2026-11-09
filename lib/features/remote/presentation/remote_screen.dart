@@ -6,6 +6,7 @@ import '../../../app/router.dart';
 import '../../../app/theme/app_theme.dart';
 import '../../../core/protocol/tv_protocol.dart';
 import '../../../shared/widgets/connection_badge.dart';
+import '../../../shared/widgets/connection_banner.dart';
 import '../../../shared/widgets/remote_button.dart';
 import '../domain/remote_controller.dart';
 
@@ -41,6 +42,7 @@ class RemoteScreen extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Column(
                 children: [
+                  const ConnectionBanner(),
                   // Ligne du haut : Power / Accueil / Menu
                   const Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -83,6 +85,12 @@ class RemoteScreen extends ConsumerWidget {
                       RemoteButton(tvKey: TvKey.fastForward, icon: Icons.fast_forward_rounded, label: 'Avance rapide', size: 56, repeat: true),
                     ],
                   ),
+                  if (session.volume case final v?) ...[
+                    const SizedBox(height: 20),
+                    _VolumeBar(level: v.level, max: v.max, muted: v.muted),
+                  ],
+                  const SizedBox(height: 28),
+                  const _AppShortcuts(),
                 ],
               ),
             );
@@ -173,6 +181,94 @@ class _ActionCircle extends StatelessWidget {
           child: SizedBox(width: 64, height: 64, child: Icon(icon, color: AppColors.textPrimary)),
         ),
       ),
+    );
+  }
+}
+
+class _VolumeBar extends StatelessWidget {
+  const _VolumeBar({required this.level, required this.max, required this.muted});
+
+  final int level;
+  final int max;
+  final bool muted;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(muted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+            size: 18, color: AppColors.textSecondary),
+        const SizedBox(width: 10),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: max > 0 ? level / max : 0,
+              minHeight: 6,
+              backgroundColor: AppColors.surfaceHigh,
+              color: muted ? AppColors.textSecondary : AppColors.accent,
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text('$level', style: const TextStyle(color: AppColors.textSecondary)),
+      ],
+    );
+  }
+}
+
+/// Raccourcis applications (liens d'application Android TV).
+class _AppShortcuts extends ConsumerWidget {
+  const _AppShortcuts();
+
+  static const _apps = [
+    ('YouTube', 'https://www.youtube.com', Color(0xFFFF0033)),
+    ('Netflix', 'https://www.netflix.com/title', Color(0xFFE50914)),
+    ('Prime Video', 'https://app.primevideo.com', Color(0xFF1399FF)),
+  ];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Applications', style: TextStyle(color: AppColors.textSecondary)),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            for (final (name, link, color) in _apps)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Material(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () async {
+                        try {
+                          await ref.read(remoteControllerProvider.notifier).launchApp(link);
+                        } on Exception catch (e) {
+                          if (context.mounted) showNotConnected(context, e);
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        child: Column(
+                          children: [
+                            Icon(Icons.play_circle_fill_rounded, color: color),
+                            const SizedBox(height: 6),
+                            Text(name, style: const TextStyle(fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }

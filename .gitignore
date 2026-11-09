@@ -46,3 +46,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Outil de test : identité et code locaux
+/tool/.identity.json
+/tool/.code
