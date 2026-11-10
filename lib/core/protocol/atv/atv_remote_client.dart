@@ -224,16 +224,25 @@ class AtvRemoteClient implements TvProtocol {
     _send(RemoteMessages.keyInject(androidKeyCodes[key]!, directionCode(press)));
   }
 
+  /// Vrai si le téléviseur a signalé un champ texte (compteurs IME connus).
+  bool get hasTextField => _imeCounter != null && _fieldCounter != null;
+
+  /// Remplace le contenu du champ texte ouvert sur le téléviseur par [text].
   @override
   Future<void> sendText(String text) async {
     _requireConnected();
-    if (text.isEmpty) return;
     final ime = _imeCounter;
     final field = _fieldCounter;
     if (ime == null || field == null) {
       throw const TvFeatureException('Aucun champ texte ouvert sur le téléviseur.');
     }
     _send(RemoteMessages.imeBatchEdit(imeCounter: ime, fieldCounter: field, text: text));
+  }
+
+  /// Envoie un code touche Android brut (saisie lettre par lettre).
+  Future<void> sendKeyCode(int keyCode) async {
+    _requireConnected();
+    _send(RemoteMessages.keyInject(keyCode, directionCode(KeyPress.short)));
   }
 
   @override

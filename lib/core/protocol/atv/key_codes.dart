@@ -35,3 +35,24 @@ int directionCode(KeyPress press) => switch (press) {
       KeyPress.longEnd => 2,
       KeyPress.short => 3,
     };
+
+/// Code touche Android pour un caractère (saisie de secours lettre par lettre).
+/// Retourne null pour les caractères non représentables (accents…).
+int? charKeyCode(String ch) {
+  final c = ch.toLowerCase();
+  final u = c.codeUnitAt(0);
+  if (u >= 0x61 && u <= 0x7A) return 29 + (u - 0x61); // a-z → KEYCODE_A..Z
+  if (u >= 0x30 && u <= 0x39) return 7 + (u - 0x30); // 0-9 → KEYCODE_0..9
+  return const {
+    ' ': 62,
+    '.': 56,
+    ',': 55,
+    '-': 69,
+    '=': 70,
+    '@': 77,
+    '/': 76,
+    "'": 75,
+    ';': 74,
+    '+': 81,
+  }[c];
+}

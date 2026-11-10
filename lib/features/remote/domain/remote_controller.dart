@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/protocol/atv/atv_remote_client.dart';
+import '../../../core/protocol/atv/key_codes.dart';
 import '../../../core/protocol/tv_protocol.dart';
 import '../../../core/storage/identity_store.dart';
 import '../../../shared/models/tv_device.dart';
@@ -94,6 +95,32 @@ class RemoteController extends Notifier<RemoteSession> {
   Future<void> sendText(String text) => _requireConnected().sendText(text);
 
   Future<void> launchApp(String link) => _requireConnected().launchApp(link);
+
+  /// Synchronise le champ texte du téléviseur avec [text] (saisie en direct).
+  ///
+  /// 1. Si le téléviseur a signalé un champ texte : le contenu est remplacé
+  ///    d'un coup (méthode IME, gère accents et majuscules).
+  /// 2. Sinon : secours lettre par lettre via les touches (Effacer + lettres),
+  ///    à partir de la différence avec [previous].
+  Future<void> syncText(String text, String previous) async {
+    _requireConnected();
+    final c = _client!;
+    if (c.hasTextField) {
+      await c.sendText(text);
+      return;
+    }
+    var common = 0;
+    while (common < text.length && common < previous.length && text[common] == previous[common]) {
+      common++;
+    }
+    for (var i = 0; i < previous.length - common; i++) {
+      await c.sendKeyCode(androidKeyCodes[TvKey.delete]!);
+    }
+    for (final ch in text.substring(common).split('')) {
+      final code = charKeyCode(ch);
+      if (code != null) await c.sendKeyCode(code);
+    }
+  }
 }
 
 final remoteControllerProvider =

@@ -99,6 +99,15 @@ void main() {
       expect((msg.level, msg.max, msg.muted), (25, 100, false));
     });
 
+    test('saisie de secours : lettres, chiffres, espace', () {
+      expect(charKeyCode('a'), 29); // KEYCODE_A
+      expect(charKeyCode('Z'), 54); // KEYCODE_Z (majuscule → minuscule)
+      expect(charKeyCode('0'), 7); // KEYCODE_0
+      expect(charKeyCode('9'), 16);
+      expect(charKeyCode(' '), 62); // KEYCODE_SPACE
+      expect(charKeyCode('é'), isNull);
+    });
+
     test('toutes les touches ont un code', () {
       for (final k in TvKey.values) {
         expect(androidKeyCodes[k], isNotNull, reason: '$k');
