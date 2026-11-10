@@ -5,6 +5,7 @@
 //         (ou le passer en 3e argument : pair <ip> <code> si déjà affiché)
 //   dart run tool/atv_cli.dart key 192.168.100.3 home down ok
 //   dart run tool/atv_cli.dart info 192.168.100.3
+//   dart run tool/atv_cli.dart text 192.168.100.3 "mot"   (champ texte ouvert sur la TV)
 import 'dart:convert';
 import 'dart:io';
 
@@ -54,7 +55,7 @@ Future<void> main(List<String> args) async {
       await c.finish(code);
       stdout.writeln('ASSOCIATION_OK');
 
-    case 'key' || 'info':
+    case 'key' || 'info' || 'text':
       final r = AtvRemoteClient(host: ip, identity: id, autoReconnect: false);
       r.states.listen((s) => stdout.writeln('état: ${s.status.name} ${s.message ?? ''}'));
       r.volumes.listen((v) => stdout.writeln('volume: ${v.level}/${v.max} muet=${v.muted}'));
@@ -67,6 +68,15 @@ Future<void> main(List<String> args) async {
           stdout.writeln('→ $name');
           await Future<void>.delayed(const Duration(milliseconds: 600));
         }
+      } else if (cmd == 'text') {
+        // Laisse au téléviseur le temps d'annoncer son champ texte.
+        await Future<void>.delayed(const Duration(seconds: 2));
+        stdout.writeln('champ texte signalé : ${r.hasTextField}  appli : ${r.currentApp}');
+        if (r.hasTextField) {
+          await r.sendText(args[2]);
+          stdout.writeln('→ texte envoyé (IME)');
+        }
+        await Future<void>.delayed(const Duration(seconds: 2));
       } else {
         await Future<void>.delayed(const Duration(seconds: 3));
       }

@@ -21,6 +21,10 @@ Stream<List<TvDevice>> discoverTvs() {
 
   Future<void> start() async {
     try {
+      // « androidtvremote2 » fait 16 caractères : au-delà de la limite de 15
+      // de la RFC 6763 que le plugin vérifie, mais c'est bien le nom que
+      // Google utilise. Bonjour (iOS) et NsdManager (Android) l'acceptent.
+      nsd.disableServiceTypeValidation(true);
       discovery = await nsd.startDiscovery(atvServiceType, ipLookupType: nsd.IpLookupType.v4);
       discovery!.addServiceListener((service, status) {
         final name = service.name;
